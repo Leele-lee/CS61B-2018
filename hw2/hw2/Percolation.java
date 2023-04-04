@@ -1,15 +1,16 @@
 package hw2;
-
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import java.util.ArrayList;
+
+
 import java.util.Arrays;
 
 public class Percolation {
     private boolean[][] grids;
     private int rowIndex;
     private int colIndex;
-    private int vTop = rowIndex * colIndex + 1;
-    private int vBot = rowIndex * colIndex + 2;
+    private int vTop;
+    private int vBot;
     private WeightedQuickUnionUF WQUF;
     private int openNumber;
     private ArrayList<Integer> bottom = new ArrayList<>();
@@ -25,11 +26,13 @@ public class Percolation {
         openNumber = 0;
         rowIndex = N;
         colIndex = N;
-        WQUF = new WeightedQuickUnionUF(rowIndex * colIndex);
+        vTop = N * N;
+        vBot = N * N + 1;
+        WQUF = new WeightedQuickUnionUF(rowIndex * colIndex + 2);
         grids = new boolean[N][N];
-        for (int i = 0; i < N; i++) {
-            Arrays.fill(grids[i], false);
-        }
+        //for (int i = 0; i < N; i++) {
+        // Arrays.fill(grids[i], false);
+        //}
     }
 
     public void open(int row, int col) {
@@ -81,7 +84,6 @@ public class Percolation {
             }
         } else if (row == rowIndex - 1) {
             bottom.add(currentSide);
-            // WQUF.union(currentSide, vBot);
             if (col == 0) {
                 if (isOpen(row - 1, col)) {
                     WQUF.union(currentSide, upSide);
@@ -165,8 +167,10 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        for (int i : bottom) {
-            WQUF.union(i, vBot);
+        for (Integer i : bottom) {
+            if (!i.equals(0)) {
+                WQUF.union(i, vBot);
+            }
         }
         return WQUF.connected(vTop, vBot);
     }
