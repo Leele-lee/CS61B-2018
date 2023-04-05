@@ -42,6 +42,8 @@ public class Percolation {
         if (!isOpen(row, col)) {
             openNumber += 1;
             grids[row][col] = true;
+            int currentSide = xyTo1D(row, col);
+
             checkUnion(row, col);
         }
     }
@@ -57,92 +59,28 @@ public class Percolation {
         int rightSide = xyTo1D(row, col + 1);
         if (row == 0) {
             WQUF.union(currentSide, vTop);
-            if (col == 0) {
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-            } else if (col == colIndex - 1) {
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-            } else {
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
+        }
+        if (row - 1 >= 0) {
+            if (isOpen(row - 1, col)) {
+                WQUF.union(upSide, currentSide);
             }
-        } else if (row == rowIndex - 1) {
+        }
+        if (row + 1 < rowIndex) {
+            if (isOpen(row + 1, col)) {
+                WQUF.union(currentSide, downSide);
+            }
+        }
+        if (row == rowIndex - 1) {
             bottom.add(currentSide);
-            if (col == 0) {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
-            } else if (col == colIndex - 1) {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
-            } else {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
+        }
+        if (col - 1 >= 0) {
+            if (isOpen(row, col - 1)) {
+                WQUF.union(currentSide, leftSide);
             }
-        } else {
-            if (col == 0) {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-            } else if (col == colIndex - 1) {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-            } else {
-                if (isOpen(row - 1, col)) {
-                    WQUF.union(currentSide, upSide);
-                }
-                if (isOpen(row, col - 1)) {
-                    WQUF.union(currentSide, leftSide);
-                }
-                if (isOpen(row + 1, col)) {
-                    WQUF.union(currentSide, downSide);
-                }
-                if (isOpen(row, col + 1)) {
-                    WQUF.union(currentSide, rightSide);
-                }
+        }
+        if (col + 1 < colIndex) {
+            if (isOpen(row, col + 1)) {
+                WQUF.union(currentSide, rightSide);
             }
         }
     }
@@ -168,9 +106,7 @@ public class Percolation {
 
     public boolean percolates() {
         for (Integer i : bottom) {
-            if (!i.equals(0)) {
-                WQUF.union(i, vBot);
-            }
+            WQUF.union(i, vBot);
         }
         return WQUF.connected(vTop, vBot);
     }
