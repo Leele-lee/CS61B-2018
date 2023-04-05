@@ -115,4 +115,6 @@ public class Percolation {
         }
         return percolationed;
     }
+    public static void main(String[] args) { // test client (optional)
+    }
 }
