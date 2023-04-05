@@ -1,17 +1,16 @@
 package hw2;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 import java.util.ArrayList;
-
-
 import java.util.Arrays;
 
 public class Percolation {
-    private boolean[][] grids;
-    private int rowIndex;
-    private int colIndex;
-    private int vTop;
-    private int vBot;
+    private final boolean[][] grids;
+    private final int rowIndex;
+    private final int colIndex;
+    private final int vTop;
+    private final int vBot;
     private WeightedQuickUnionUF WQUF;
+    private WeightedQuickUnionUF WQUFNOBOT;
     private int openNumber;
     private boolean percolationed;
     private ArrayList<Integer> bottom = new ArrayList<>();
@@ -31,10 +30,8 @@ public class Percolation {
         vTop = N * N;
         vBot = N * N + 1;
         WQUF = new WeightedQuickUnionUF(rowIndex * colIndex + 2);
+        WQUFNOBOT = new WeightedQuickUnionUF(rowIndex * colIndex + 1);
         grids = new boolean[N][N];
-        //for (int i = 0; i < N; i++) {
-        // Arrays.fill(grids[i], false);
-        //}
     }
 
     public void open(int row, int col) {
@@ -45,7 +42,6 @@ public class Percolation {
             openNumber += 1;
             grids[row][col] = true;
             int currentSide = xyTo1D(row, col);
-
             checkUnion(row, col);
         }
     }
@@ -61,28 +57,34 @@ public class Percolation {
         int rightSide = xyTo1D(row, col + 1);
         if (row == 0) {
             WQUF.union(currentSide, vTop);
+            WQUFNOBOT.union(currentSide, vTop);
         }
         if (row - 1 >= 0) {
             if (isOpen(row - 1, col)) {
                 WQUF.union(upSide, currentSide);
+                WQUFNOBOT.union(upSide, currentSide);
             }
         }
         if (row + 1 < rowIndex) {
             if (isOpen(row + 1, col)) {
                 WQUF.union(currentSide, downSide);
+                WQUFNOBOT.union(currentSide, downSide);
             }
         }
         if (row == rowIndex - 1) {
-            bottom.add(currentSide);
+            //bottom.add(currentSide);
+            WQUF.union(currentSide, vBot);
         }
         if (col - 1 >= 0) {
             if (isOpen(row, col - 1)) {
                 WQUF.union(currentSide, leftSide);
+                WQUFNOBOT.union(currentSide, leftSide);
             }
         }
         if (col + 1 < colIndex) {
             if (isOpen(row, col + 1)) {
                 WQUF.union(currentSide, rightSide);
+                WQUFNOBOT.union(currentSide, rightSide);
             }
         }
     }
@@ -99,7 +101,7 @@ public class Percolation {
             throw new IndexOutOfBoundsException();
         }
         int currentItem = xyTo1D(row, col);
-        return WQUF.connected(currentItem, vTop);
+        return WQUFNOBOT.connected(currentItem, vTop);
     }
 
     public int numberOfOpenSites() {
@@ -108,10 +110,6 @@ public class Percolation {
 
     public boolean percolates() {
         if (percolationed == false) {
-
-            for (Integer i : bottom) {
-                WQUF.union(i, vBot);
-            }
             percolationed = WQUF.connected(vTop, vBot);
             return percolationed;
         }
