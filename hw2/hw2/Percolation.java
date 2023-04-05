@@ -13,6 +13,7 @@ public class Percolation {
     private int vBot;
     private WeightedQuickUnionUF WQUF;
     private int openNumber;
+    private boolean percolationed;
     private ArrayList<Integer> bottom = new ArrayList<>();
 
     private int xyTo1D(int row, int col) {
@@ -23,6 +24,7 @@ public class Percolation {
         if (N <= 0) {
             throw new IllegalArgumentException();
         }
+        percolationed = false;
         openNumber = 0;
         rowIndex = N;
         colIndex = N;
@@ -105,9 +107,14 @@ public class Percolation {
     }
 
     public boolean percolates() {
-        for (Integer i : bottom) {
-            WQUF.union(i, vBot);
+        if (percolationed == false) {
+
+            for (Integer i : bottom) {
+                WQUF.union(i, vBot);
+            }
+            percolationed = WQUF.connected(vTop, vBot);
+            return percolationed;
         }
-        return WQUF.connected(vTop, vBot);
+        return percolationed;
     }
 }
